@@ -7,9 +7,36 @@ import { readApiError } from "@/lib/auth-api";
 import { withAuthRequest } from "@/lib/auth-session";
 import { api, authHeaders, type ApiEnvelope } from "@/lib/api";
 
-export async function fetchProducts(pageSize = 100) {
+const CATALOG_PAGE_SIZE = 48;
+
+export async function fetchAllProducts() {
+  let page = 1;
+  let total = Number.POSITIVE_INFINITY;
+  const items: ProductDto[] = [];
+
+  while (items.length < total) {
+    const response = await api.get<ApiEnvelope<ProductDto[]>>("/products", {
+      params: { page, pageSize: CATALOG_PAGE_SIZE, sort: "newest" },
+    });
+
+    const batch = response.data.data ?? [];
+    total = response.data.meta?.total ?? batch.length;
+    items.push(...batch);
+
+    if (batch.length === 0) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return items;
+}
+
+/** @deprecated Use fetchAllProducts() */
+export async function fetchProducts(pageSize = CATALOG_PAGE_SIZE) {
   const response = await api.get<ApiEnvelope<ProductDto[]>>("/products", {
-    params: { page: 1, pageSize },
+    params: { page: 1, pageSize: Math.min(pageSize, CATALOG_PAGE_SIZE) },
   });
 
   return response.data.data ?? [];

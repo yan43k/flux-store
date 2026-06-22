@@ -6,7 +6,7 @@ import { ProductActions } from "@/features/products/components/product-actions";
 import { ProductCard } from "@/features/products/components/product-card";
 import { demoProducts } from "@/features/products/data/demo-products";
 import { formatPrice } from "@/lib/format";
-import { fetchProductBySlug, fetchProducts } from "@/lib/products-api";
+import { fetchAllProducts, fetchProductBySlug } from "@/lib/products-api";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -24,7 +24,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const catalog = await fetchProducts().catch(() => demoProducts);
+  const catalog = await fetchAllProducts().catch(() => demoProducts);
   const related = catalog.filter((item) => item.id !== product.id).slice(0, 3);
 
   return (

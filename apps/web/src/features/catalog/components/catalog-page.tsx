@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ProductCard } from "@/features/products/components/product-card";
 import { categories, demoProducts } from "@/features/products/data/demo-products";
-import { fetchProducts } from "@/lib/products-api";
+import { fetchAllProducts } from "@/lib/products-api";
 
 const categoryNameBySlug = Object.fromEntries(categories.map((c) => [c.slug, c.name]));
 
@@ -55,18 +55,44 @@ export function CatalogPage() {
 
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("popular");
-  const [catalog, setCatalog] = useState<ProductDto[]>(demoProducts);
+  const [catalog, setCatalog] = useState<ProductDto[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
 
   useEffect(() => {
-    void fetchProducts()
-      .then((items) => {
-        if (items.length > 0) {
-          setCatalog(items);
-        }
-      })
-      .catch(() => {
-        // keep demo fallback
-      });
+    let active = true;
+
+    const loadCatalog = () => {
+      setCatalogLoading(true);
+
+      void fetchAllProducts()
+        .then((items) => {
+          if (!active) {
+            return;
+          }
+
+          setCatalog(items.length > 0 ? items : demoProducts);
+        })
+        .catch(() => {
+          if (!active) {
+            return;
+          }
+
+          setCatalog(demoProducts);
+        })
+        .finally(() => {
+          if (active) {
+            setCatalogLoading(false);
+          }
+        });
+    };
+
+    loadCatalog();
+    window.addEventListener("focus", loadCatalog);
+
+    return () => {
+      active = false;
+      window.removeEventListener("focus", loadCatalog);
+    };
   }, []);
 
   const products = useMemo(() => {
@@ -139,7 +165,9 @@ export function CatalogPage() {
 
           <div>
             <div className="mb-5 flex items-center justify-between text-sm text-flux-muted">
-              <span>Найдено товаров: {products.length}</span>
+              <span>
+                {catalogLoading ? "Загружаем каталог…" : `Найдено товаров: ${products.length}`}
+              </span>
               <span>Страница 1 из 1</span>
             </div>
             {products.length === 0 ? (
