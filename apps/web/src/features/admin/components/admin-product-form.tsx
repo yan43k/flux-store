@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/features/products/data/demo-products";
 import { createAdminProduct, updateAdminProduct } from "@/lib/products-api";
-import { useAuthStore } from "@/stores/auth-store";
 
 type AdminProductFormProps = {
   product?: ProductDto | null;
@@ -51,7 +50,6 @@ function toFormState(product?: ProductDto | null): FormState {
 }
 
 export function AdminProductForm({ product, onClose, onSaved }: AdminProductFormProps) {
-  const accessToken = useAuthStore((state) => state.accessToken);
   const [form, setForm] = useState<FormState>(() => toFormState(product));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -60,11 +58,6 @@ export function AdminProductForm({ product, onClose, onSaved }: AdminProductForm
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    if (!accessToken) {
-      setError("Сессия истекла. Войдите снова.");
-      return;
-    }
 
     setSaving(true);
     setError(null);
@@ -82,9 +75,9 @@ export function AdminProductForm({ product, onClose, onSaved }: AdminProductForm
 
     try {
       if (isEdit && product) {
-        await updateAdminProduct(accessToken, product.id, payload);
+        await updateAdminProduct(product.id, payload);
       } else {
-        await createAdminProduct(accessToken, payload);
+        await createAdminProduct(payload);
       }
 
       onSaved();

@@ -85,6 +85,12 @@ export const registerSchema = loginSchema.extend({
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 
+export const refreshSchema = z.object({
+  refreshToken: z.string().min(1),
+});
+
+export type RefreshInput = z.infer<typeof refreshSchema>;
+
 export const adminProductCreateSchema = z.object({
   name: z.string().min(2).max(120),
   brand: z.string().min(1).max(80),

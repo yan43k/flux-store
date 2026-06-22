@@ -19,3 +19,11 @@ export const login: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const refresh: RequestHandler = async (req, res, next) => {
+  try {
+    res.json(ok(await authService.refresh(req.body.refreshToken)));
+  } catch (error) {
+    next(error);
+  }
+};

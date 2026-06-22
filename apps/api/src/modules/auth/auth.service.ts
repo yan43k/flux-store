@@ -45,15 +45,42 @@ export class AuthService {
     return this.createSession(user);
   }
 
+  async refresh(refreshToken: string) {
+    const refreshSecret = process.env.JWT_REFRESH_SECRET ?? "dev-refresh-secret";
+
+    try {
+      const payload = jwt.verify(refreshToken, refreshSecret) as {
+        sub: string;
+        role: string;
+        email: string;
+      };
+      const user = await this.authRepository.findById(payload.sub);
+
+      if (!user) {
+        throw new AppError("UNAUTHORIZED", "Сессия истекла. Войдите снова.", 401);
+      }
+
+      return this.createSession(user);
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error;
+      }
+
+      throw new AppError("UNAUTHORIZED", "Сессия истекла. Войдите снова.", 401);
+    }
+  }
+
   private createSession(user: AuthUser) {
     const accessSecret = process.env.JWT_ACCESS_SECRET ?? "dev-access-secret";
     const refreshSecret = process.env.JWT_REFRESH_SECRET ?? "dev-refresh-secret";
+    const accessTtl = (process.env.JWT_ACCESS_TTL ?? "15m") as jwt.SignOptions["expiresIn"];
+    const refreshTtl = (process.env.JWT_REFRESH_TTL ?? "30d") as jwt.SignOptions["expiresIn"];
     const payload = { sub: user.id, role: user.role, email: user.email };
 
     return {
       user: publicUser(user),
-      accessToken: jwt.sign(payload, accessSecret, { expiresIn: "15m" }),
-      refreshToken: jwt.sign(payload, refreshSecret, { expiresIn: "30d" }),
+      accessToken: jwt.sign(payload, accessSecret, { expiresIn: accessTtl }),
+      refreshToken: jwt.sign(payload, refreshSecret, { expiresIn: refreshTtl }),
     };
   }
 }

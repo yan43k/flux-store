@@ -3,6 +3,7 @@
 import type { ProductDto } from "@flux/shared";
 import { BarChart3, Boxes, PackagePlus, ShoppingCart, Users } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,6 +26,7 @@ const orders = [
 ];
 
 export function AdminDashboard() {
+  const router = useRouter();
   const accessToken = useAuthStore((state) => state.accessToken);
   const [products, setProducts] = useState<ProductDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,13 +43,19 @@ export function AdminDashboard() {
     setError(null);
 
     try {
-      setProducts(await fetchAdminProducts(accessToken));
+      setProducts(await fetchAdminProducts());
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Не удалось загрузить товары.");
+      const message =
+        loadError instanceof Error ? loadError.message : "Не удалось загрузить товары.";
+      setError(message);
+
+      if (message.includes("Сессия истекла") || message.includes("Нужно войти")) {
+        router.replace("/login?next=/admin");
+      }
     } finally {
       setLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, router]);
 
   useEffect(() => {
     void loadProducts();

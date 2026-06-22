@@ -63,6 +63,15 @@ export class AuthRepository {
     return user ? mapUser(user) : null;
   }
 
+  async findById(id: string) {
+    if (useMockAuth()) {
+      return mockUsers.find((user) => user.id === id) ?? null;
+    }
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    return user ? mapUser(user) : null;
+  }
+
   async create(input: Pick<AuthUser, "name" | "email" | "passwordHash">) {
     if (useMockAuth()) {
       const user: AuthUser = {

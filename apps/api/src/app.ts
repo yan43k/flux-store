@@ -12,7 +12,11 @@ export const createApp = () => {
   const app = express();
 
   app.use(helmet());
-  app.use(cors({ origin: process.env.CORS_ORIGIN?.split(",") ?? "*" }));
+  app.use(cors({
+    origin: process.env.CORS_ORIGIN?.split(",") ?? "*",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  }));
   app.use(express.json());
   app.use(morgan("dev"));
 
