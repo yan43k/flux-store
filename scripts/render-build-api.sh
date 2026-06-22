@@ -10,9 +10,10 @@ cp "$API/prisma/schema.postgresql.prisma" "$API/prisma/schema.prisma"
 rm -rf "$API/prisma/migrations"
 cp -R "$API/prisma/migrations-postgres" "$API/prisma/migrations"
 
-echo "==> npm install (monorepo)"
+echo "==> npm install (monorepo, with devDependencies for build)"
 cd "$ROOT"
-npm install
+export NPM_CONFIG_PRODUCTION=false
+npm install --include=dev
 
 echo "==> build @flux/shared"
 npm run build -w @flux/shared

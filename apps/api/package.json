@@ -28,9 +28,7 @@
     "jsonwebtoken": "latest",
     "morgan": "latest",
     "pg": "^8.22.0",
-    "zod": "latest"
-  },
-  "devDependencies": {
+    "zod": "latest",
     "@types/bcrypt": "latest",
     "@types/cors": "latest",
     "@types/express": "latest",
@@ -38,8 +36,10 @@
     "@types/morgan": "latest",
     "@types/node": "latest",
     "@types/pg": "^8.20.0",
-    "prisma": "latest",
-    "tsx": "latest",
     "typescript": "latest"
+  },
+  "devDependencies": {
+    "prisma": "latest",
+    "tsx": "latest"
   }
 }

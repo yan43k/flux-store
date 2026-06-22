@@ -25,15 +25,15 @@
     "react-hook-form": "latest",
     "sonner": "latest",
     "tailwind-merge": "latest",
+    "tailwindcss": "latest",
+    "@tailwindcss/postcss": "latest",
     "zustand": "latest",
     "zod": "latest"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "latest",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "tailwindcss": "latest",
     "typescript": "latest"
   }
 }

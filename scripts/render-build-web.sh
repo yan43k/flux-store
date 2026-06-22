@@ -11,8 +11,9 @@ if [ -z "${NEXT_PUBLIC_API_URL:-}" ]; then
   echo "  https://flux-store-api.onrender.com/api/v1"
 fi
 
-echo "==> npm install"
-npm install
+echo "==> npm install (with devDependencies for Next/Tailwind build)"
+export NPM_CONFIG_PRODUCTION=false
+npm install --include=dev
 
 echo "==> build @flux/shared + @flux/web"
 npm run build -w @flux/shared
