@@ -6,6 +6,7 @@ import { ProductActions } from "@/features/products/components/product-actions";
 import { ProductCard } from "@/features/products/components/product-card";
 import { demoProducts } from "@/features/products/data/demo-products";
 import { formatPrice } from "@/lib/format";
+import { fetchProductBySlug, fetchProducts } from "@/lib/products-api";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -13,13 +14,18 @@ type ProductPageProps = {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = demoProducts.find((item) => item.slug === slug);
+  let product = await fetchProductBySlug(slug);
+
+  if (!product) {
+    product = demoProducts.find((item) => item.slug === slug) ?? null;
+  }
 
   if (!product) {
     notFound();
   }
 
-  const related = demoProducts.filter((item) => item.id !== product.id).slice(0, 3);
+  const catalog = await fetchProducts().catch(() => demoProducts);
+  const related = catalog.filter((item) => item.id !== product.id).slice(0, 3);
 
   return (
     <PageShell>

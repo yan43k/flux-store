@@ -5,7 +5,11 @@ import { RecommendationsService } from "./recommendations.service.js";
 export const recommendationsRouter = Router();
 const recommendationsService = new RecommendationsService();
 
-recommendationsRouter.get("/", (req, res) => {
-  const productSlug = typeof req.query.productSlug === "string" ? req.query.productSlug : undefined;
-  res.json(ok(recommendationsService.getSmartPicks(productSlug)));
+recommendationsRouter.get("/", async (req, res, next) => {
+  try {
+    const productSlug = typeof req.query.productSlug === "string" ? req.query.productSlug : undefined;
+    res.json(ok(await recommendationsService.getSmartPicks(productSlug)));
+  } catch (error) {
+    next(error);
+  }
 });

@@ -2,15 +2,17 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { ProductDto } from "@flux/shared";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { ProductCard } from "@/features/products/components/product-card";
 import { categories, demoProducts } from "@/features/products/data/demo-products";
+import { fetchProducts } from "@/lib/products-api";
 
 const categoryNameBySlug = Object.fromEntries(categories.map((c) => [c.slug, c.name]));
 
-function productSearchHaystack(product: (typeof demoProducts)[number]) {
+function productSearchHaystack(product: ProductDto) {
   const categoryName = categoryNameBySlug[product.categorySlug] ?? product.categorySlug;
   const specText = Object.entries(product.specs)
     .flat()
@@ -53,10 +55,23 @@ export function CatalogPage() {
 
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("popular");
+  const [catalog, setCatalog] = useState<ProductDto[]>(demoProducts);
+
+  useEffect(() => {
+    void fetchProducts()
+      .then((items) => {
+        if (items.length > 0) {
+          setCatalog(items);
+        }
+      })
+      .catch(() => {
+        // keep demo fallback
+      });
+  }, []);
 
   const products = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const filtered = demoProducts.filter((product) => {
+    const filtered = catalog.filter((product) => {
       const matchesCategory = category === "all" || product.categorySlug === category;
       const matchesQuery =
         needle.length === 0 || productSearchHaystack(product).includes(needle);
@@ -69,7 +84,7 @@ export function CatalogPage() {
       if (sort === "rating") return b.rating - a.rating;
       return b.reviewCount - a.reviewCount;
     });
-  }, [category, query, sort]);
+  }, [catalog, category, query, sort]);
 
   return (
     <PageShell>

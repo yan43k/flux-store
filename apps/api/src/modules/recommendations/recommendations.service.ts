@@ -3,9 +3,9 @@ import { ProductsRepository } from "../products/products.repository.js";
 export class RecommendationsService {
   constructor(private readonly productsRepository = new ProductsRepository()) {}
 
-  getSmartPicks(productSlug?: string) {
-    const products = this.productsRepository.findMany();
-    const anchor = productSlug ? this.productsRepository.findBySlug(productSlug) : null;
+  async getSmartPicks(productSlug?: string) {
+    const products = await this.productsRepository.findMany();
+    const anchor = productSlug ? await this.productsRepository.findBySlug(productSlug) : null;
 
     return products
       .filter((product) => product.slug !== productSlug)

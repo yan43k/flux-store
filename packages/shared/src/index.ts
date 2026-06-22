@@ -84,3 +84,19 @@ export const registerSchema = loginSchema.extend({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+export const adminProductCreateSchema = z.object({
+  name: z.string().min(2).max(120),
+  brand: z.string().min(1).max(80),
+  categorySlug: productCategorySchema,
+  price: z.coerce.number().nonnegative(),
+  oldPrice: z.coerce.number().nonnegative().optional(),
+  stock: z.coerce.number().int().nonnegative().default(0),
+  description: z.string().min(10).max(5000),
+  image: z.string().min(1).optional(),
+});
+
+export const adminProductUpdateSchema = adminProductCreateSchema.partial();
+
+export type AdminProductCreateInput = z.infer<typeof adminProductCreateSchema>;
+export type AdminProductUpdateInput = z.infer<typeof adminProductUpdateSchema>;

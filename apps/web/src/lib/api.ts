@@ -24,4 +24,9 @@ export type ApiEnvelope<T> = {
   success: boolean;
   data?: T;
   error?: { code: string; message: string; details?: unknown };
+  meta?: { page?: number; pageSize?: number; total?: number };
 };
+
+export function authHeaders(token: string) {
+  return { Authorization: `Bearer ${token}` };
+}

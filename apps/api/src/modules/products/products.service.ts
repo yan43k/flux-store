@@ -1,12 +1,16 @@
-import type { CatalogQuery } from "@flux/shared";
+import type {
+  AdminProductCreateInput,
+  AdminProductUpdateInput,
+  CatalogQuery,
+} from "@flux/shared";
 import { AppError } from "../../shared/errors/app-error.js";
 import { ProductsRepository } from "./products.repository.js";
 
 export class ProductsService {
   constructor(private readonly productsRepository = new ProductsRepository()) {}
 
-  getCatalog(query: CatalogQuery) {
-    const products = this.productsRepository.findMany().filter((product) => {
+  async getCatalog(query: CatalogQuery) {
+    const products = (await this.productsRepository.findMany()).filter((product) => {
       const matchesSearch = query.search
         ? `${product.name} ${product.brand}`.toLowerCase().includes(query.search.toLowerCase())
         : true;
@@ -48,13 +52,29 @@ export class ProductsService {
     };
   }
 
-  getBySlug(slug: string) {
-    const product = this.productsRepository.findBySlug(slug);
+  async getBySlug(slug: string) {
+    const product = await this.productsRepository.findBySlug(slug);
 
     if (!product) {
-      throw new AppError("PRODUCT_NOT_FOUND", "Product not found", 404);
+      throw new AppError("PRODUCT_NOT_FOUND", "Товар не найден.", 404);
     }
 
     return product;
+  }
+
+  listAdmin() {
+    return this.productsRepository.findAllAdmin();
+  }
+
+  createAdmin(input: AdminProductCreateInput) {
+    return this.productsRepository.create(input);
+  }
+
+  updateAdmin(id: string, input: AdminProductUpdateInput) {
+    return this.productsRepository.update(id, input);
+  }
+
+  removeAdmin(id: string) {
+    return this.productsRepository.remove(id);
   }
 }
