@@ -92,13 +92,16 @@ export const refreshSchema = z.object({
 export type RefreshInput = z.infer<typeof refreshSchema>;
 
 export const adminProductCreateSchema = z.object({
-  name: z.string().min(2).max(120),
-  brand: z.string().min(1).max(80),
+  name: z.string().min(2, "Минимум 2 символа.").max(120, "Максимум 120 символов."),
+  brand: z.string().min(1, "Укажите бренд.").max(80, "Максимум 80 символов."),
   categorySlug: productCategorySchema,
-  price: z.coerce.number().nonnegative(),
-  oldPrice: z.coerce.number().nonnegative().optional(),
-  stock: z.coerce.number().int().nonnegative().default(0),
-  description: z.string().min(10).max(5000),
+  price: z.coerce.number().nonnegative("Цена не может быть отрицательной."),
+  oldPrice: z.coerce.number().nonnegative("Старая цена не может быть отрицательной.").optional(),
+  stock: z.coerce.number().int("Остаток должен быть целым числом.").nonnegative("Остаток не может быть отрицательным.").default(0),
+  description: z
+    .string()
+    .min(10, "Описание должно быть не короче 10 символов.")
+    .max(5000, "Описание слишком длинное."),
   image: z.string().min(1).optional(),
 });
 

@@ -1,10 +1,11 @@
 "use client";
 
-import type { ProductCategorySlug, ProductDto } from "@flux/shared";
+import { adminProductCreateSchema, type ProductCategorySlug, type ProductDto } from "@flux/shared";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/features/products/data/demo-products";
 import { createAdminProduct, updateAdminProduct } from "@/lib/products-api";
+import { formatValidationDetails } from "@/lib/validation-errors";
 
 type AdminProductFormProps = {
   product?: ProductDto | null;
@@ -73,11 +74,19 @@ export function AdminProductForm({ product, onClose, onSaved }: AdminProductForm
       image: form.image.trim() || undefined,
     };
 
+    const validation = adminProductCreateSchema.safeParse(payload);
+
+    if (!validation.success) {
+      setError(formatValidationDetails(validation.error.flatten()) ?? "Проверьте введённые данные.");
+      setSaving(false);
+      return;
+    }
+
     try {
       if (isEdit && product) {
-        await updateAdminProduct(product.id, payload);
+        await updateAdminProduct(product.id, validation.data);
       } else {
-        await createAdminProduct(payload);
+        await createAdminProduct(validation.data);
       }
 
       onSaved();
@@ -191,8 +200,10 @@ export function AdminProductForm({ product, onClose, onSaved }: AdminProductForm
 
           <label className="block text-sm text-flux-muted">
             Описание
+            <span className="ml-2 text-xs text-flux-muted/80">минимум 10 символов</span>
             <textarea
               required
+              minLength={10}
               rows={4}
               value={form.description}
               onChange={(event) =>
