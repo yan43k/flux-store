@@ -1,0 +1,67 @@
+# Render Blueprint — бесплатный деплой Flux Store
+# https://render.com/docs/blueprint-spec
+#
+# Как задеплоить:
+# 1. Залейте репозиторий на GitHub
+# 2. Render Dashboard → New → Blueprint → подключите репо
+# 3. После первого деплоя API откройте flux-store-web → Environment:
+#    NEXT_PUBLIC_API_URL = https://<ваш-api>.onrender.com/api/v1
+#    и нажмите Manual Deploy (пересборка фронта)
+# 4. В flux-store-api → Environment проверьте CORS_ORIGIN = URL фронта
+
+databases:
+  - name: flux-store-db
+    databaseName: flux_store
+    user: flux_user
+    plan: free
+    region: frankfurt
+
+services:
+  - type: web
+    name: flux-store-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: bash ./scripts/render-build-api.sh
+    startCommand: npm run start -w @flux/api
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: AUTH_MODE
+        value: prisma
+      - key: DATABASE_URL
+        fromDatabase:
+          name: flux-store-db
+          property: connectionString
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_ACCESS_TTL
+        value: 15m
+      - key: JWT_REFRESH_TTL
+        value: 30d
+      - key: CORS_ORIGIN
+        value: https://flux-store-web.onrender.com
+
+  - type: web
+    name: flux-store-web
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: bash ./scripts/render-build-web.sh
+    startCommand: npm run start -w @flux/web
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: NEXT_PUBLIC_API_URL
+        value: https://flux-store-api.onrender.com/api/v1

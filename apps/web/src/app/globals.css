@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: var(--font-space-grotesk), var(--font-sora), ui-sans-serif, system-ui;
+  --font-sans: var(--font-inter), var(--font-manrope), ui-sans-serif, system-ui;
+  --font-accent: var(--font-sora), ui-sans-serif, system-ui;
+  --color-flux-space: #07020f;
+  --color-flux-void: #0d0618;
+  --color-flux-panel: #170826;
+  --color-flux-purple: #a855f7;
+  --color-flux-violet: #7c3aed;
+  --color-flux-pink: #ec4899;
+  --color-flux-text: #faf7ff;
+  --color-flux-muted: #cdbde7;
+  --shadow-flux-glow: 0 0 40px rgba(168, 85, 247, 0.35);
+  --radius-flux-card: 1.5rem;
+}
+
+:root {
+  color-scheme: dark;
+  --background: #07020f;
+  --foreground: #faf7ff;
+}
+
+.light {
+  color-scheme: light;
+  --background: #f8f4ff;
+  --foreground: #170826;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(168, 85, 247, 0.25), transparent 35%),
+    radial-gradient(circle at 90% 0%, rgba(236, 72, 153, 0.18), transparent 30%),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.light body {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(168, 85, 247, 0.18), transparent 35%),
+    radial-gradient(circle at 90% 0%, rgba(236, 72, 153, 0.12), transparent 30%),
+    var(--background);
+  color: var(--foreground);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(168, 85, 247, 0.45);
+  color: #ffffff;
+}
+
+.flux-glass {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 24px 80px rgba(12, 2, 24, 0.45);
+  backdrop-filter: blur(24px);
+}

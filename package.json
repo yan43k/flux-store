@@ -1,0 +1,27 @@
+{
+  "name": "flux-store",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Premium electronics ecommerce diploma project.",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w @flux/web\" \"npm run dev -w @flux/api\"",
+    "build": "npm run build -w @flux/shared && npm run build -w @flux/api && npm run build -w @flux/web",
+    "lint": "npm run lint -w @flux/web && npm run lint -w @flux/api && npm run lint -w @flux/shared",
+    "typecheck": "npm run typecheck -w @flux/shared && npm run typecheck -w @flux/api && npm run typecheck -w @flux/web",
+    "render:build:api": "bash scripts/render-build-api.sh",
+    "render:build:web": "bash scripts/render-build-web.sh",
+    "format": "prettier --write .",
+    "prisma:validate": "npm run prisma:validate -w @flux/api",
+    "seed": "npm run seed -w @flux/api"
+  },
+  "devDependencies": {
+    "concurrently": "latest",
+    "prettier": "latest",
+    "typescript": "latest"
+  }
+}
